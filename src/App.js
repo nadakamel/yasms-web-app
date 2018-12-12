@@ -2,12 +2,22 @@ import React, { Component } from "react";
 import "./App.css";
 import LoginScreen from "./Login/LoginScreen";
 import RegisterScreen from "./Register/RegisterScreen";
+import ChatScreen from "./Chat/ChatScreen";
+import NodeRSA from 'node-rsa';
+import SetAppServerScreen from "./AppServer/SetAppServerScreen";
 
 class App extends Component {
   constructor(props) {
     super(props);
+    const appcommunicationkey = new NodeRSA().generateKeyPair(1024);
+    const appsigningkey = new NodeRSA().generateKeyPair(1024);
     this.state = {
-      currentScreen: "LandingScreen"
+      currentScreen: "SetAppServerScreen",
+      keys: {
+        communication: appcommunicationkey,
+        signing: appsigningkey
+      },
+      appserver: {}
     };
 
     this.handleLoginClick = this.handleLoginClick.bind(this);
@@ -22,16 +32,41 @@ class App extends Component {
     this.setState({ currentScreen: "RegisterScreen" });
   }
 
+  handleLogin() {
+    this.setState({
+      currentScreen: "ChatScreen"
+    })
+  }
+
+  handleAppServerSet(serverpath, serverpingresponse) {
+    this.setState({
+      appserver: {
+        address: serverpath,
+        info: serverpingresponse
+      },
+      currentScreen: "LandingScreen"
+    })
+  }
+
+  handleRegister() {
+    this.setState({
+      currentScreen: "LoginScreen"
+    });
+  }
+
   render() {
-    if (this.state.currentScreen === "LoginScreen") {
-      return <LoginScreen />;
-    }
-    if (this.state.currentScreen === "RegisterScreen") {
-      return <RegisterScreen />;
-    }
-    if (this.state.currentScreen === "LandingScreen") {
-      return (
-        <div className="App">
+    switch (this.state.currentScreen) {
+      case "SetAppServerScreen":
+        return <SetAppServerScreen onSet={this.handleAppServerSet.bind(this)} />
+      case "LoginScreen":
+        return <LoginScreen onLogin={this.handleLogin.bind(this)} appserver={this.state.appserver} appsigningkey={this.state.keys.signing} appcommunicationkey={this.state.keys.communication} />;
+      case "RegisterScreen":
+        return <RegisterScreen csinfo={this.handlelogin} appserver={this.state.appserver} appkey={this.state.keys.communication} onRegister={this.handleRegister.bind(this)} />
+      case "ChatScreen":
+        return <ChatScreen />
+      case "LandingScreen":
+        return (
+          <div className="App">
           <header className="App-header">
             <p className="App-title">YASMS</p>
             <p className="App-subtitle">A secure messaging app</p>
@@ -43,7 +78,7 @@ class App extends Component {
             </button>
           </header>
         </div>
-      );
+        );
     }
   }
 }
