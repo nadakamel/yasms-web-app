@@ -12,7 +12,7 @@ class App extends Component {
     const appcommunicationkey = new NodeRSA().generateKeyPair(1024);
     const appsigningkey = new NodeRSA().generateKeyPair(1024);
     this.state = {
-      currentScreen: "SetAppServerScreen",
+      currentScreen: "ChatScreen",
       keys: {
         communication: appcommunicationkey,
         signing: appsigningkey

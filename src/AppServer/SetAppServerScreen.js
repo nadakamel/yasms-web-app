@@ -56,7 +56,7 @@ class SetAppServerScreen extends Component {
             value={this.state.username}
             onChange={this.handleInputChange}
           />
-          <input className="Login-button" type="submit" value="Set Central Server" />
+          <input className="Login-button" type="submit" value="Set Application Server" />
         </form>
       </div>
     );

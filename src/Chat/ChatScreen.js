@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import MessagesList from "./components/MessagesList";
-import SendMessageForm from "./components/SendMessageForm";
+import ContactsList from "./components/ContactsList";
 
 const styles = {
   container: {
@@ -13,15 +12,12 @@ const styles = {
     flex: 1
   },
   whosOnlineListContainer: {
-    width: "300px",
+    width: "30%",
     flex: "none",
-    padding: 20,
-    backgroundColor: "#2c303b",
-    color: "white"
+    display: "flex"
   },
   chatListContainer: {
-    padding: 20,
-    width: "85%",
+    width: "100%",
     display: "flex",
     flexDirection: "column"
   }
@@ -31,7 +27,8 @@ class ChatScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: ""
+      username: "",
+      sidepanelview: "chatlist"
     };
     this.sendMessage = this.sendMessage.bind(this);
   }
@@ -41,15 +38,30 @@ class ChatScreen extends Component {
   }
 
   render() {
+    let sidepanelview;
+    let mainstageview;
+    switch (this.state.sidepanelview) {
+      case "chatlist":
+        sidepanelview = <ContactsList />;
+        break;
+      case "myidentities":
+        sidepanelview = <div />;
+        break;
+      case "addchat":
+        sidepanelview = <div />;
+        break;
+      default:
+        sidepanelview = <div />;
+    }
+    mainstageview = sidepanelview === "chatlist" ? <div /> : <div />;
     return (
       <div style={styles.container}>
         <div style={styles.chatContainer}>
           <aside style={styles.whosOnlineListContainer}>
-            <h2>Who's online PLACEHOLDER</h2>
+            {sidepanelview}
           </aside>
           <section style={styles.chatListContainer}>
-            <MessagesList />
-            <SendMessageForm onSubmit={this.sendMessage} />
+            {mainstageview}
           </section>
         </div>
       </div>
