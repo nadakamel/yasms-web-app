@@ -6,10 +6,10 @@
 https://nodejs.org/en/download/
 
 2) Clone this repository to your machine using your machine's Terminal.
-`git clone https://github.com/nadakamel/yasms-app.git`
+`git clone https://github.com/nadakamel/yasms-web-app.git`
 
 3) Using Terminal, cd into project's folder directory
-`cd ~/yasms-app`
+`cd ~/yasms-web-app`
 
 3) Download node_modules folder to the project using this command line
 `npm install`
