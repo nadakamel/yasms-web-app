@@ -22,11 +22,35 @@ class ContactsList extends Component {
     }
 
     componentDidMount() {
-        
+        this.getIdentities();
     }
 
     navigateTo(view) {
         this.props.onNavigate(view);
+    }
+
+    getIdentities() {
+          let requestbody = {
+            command: "getidentities"
+          };
+          requestbody = this.props.appkeys.signing.encryptPrivate(this.props.appserver.info.keys.communication.encrypt(JSON.stringify(requestbody), 'base64'), 'base64');
+          request.post({
+            url: this.props.appserver.address + "/getidentities",
+            body: {
+              message: requestbody
+            },
+            json: true
+          }, (err, serres, body) => {
+            if (err || serres.statusCode !== 200) {
+              body = JSON.parse(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8'));
+              console.error(body);
+            } else {
+              const response = JSON.parse(this.props.appkeys.communication.decrypt(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8')).toString('utf-8'));
+              this.setState({
+                identities: response
+              });
+            }
+          });
     }
 
     render() {
@@ -44,7 +68,7 @@ class ContactsList extends Component {
             receivedfriendrequestdivs.push(<ReceivedFriendRequestItem key={"rfri_" + receivedfriendrequest} title={receivedfriendrequest} />);
         });
         this.state.identities.forEach((identity) => {
-            identityitems.push(<i key={"i_" + identity}>{identity}</i>);
+            identityitems.push(<i key={"i_" + identity} style={{marginRight: "5px"}}>{identity}</i>);
         });
         return(
             <div style={{display: "flex", flexDirection: "column", width: "100%"}}>

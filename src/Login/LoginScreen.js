@@ -46,7 +46,7 @@ class LoginScreen extends Component {
       json: true
     }, (err, serres, body) => {
       if (err || serres.statusCode !== 200) {
-        alert(JSON.parse(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8')));
+        alert(JSON.parse(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8')).message);
       } else {
         const decrpytedresponse = JSON.parse(this.props.appcommunicationkey.decrypt(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8')).toString('utf-8'));
         if (decrpytedresponse.status && decrpytedresponse.status === "success") {

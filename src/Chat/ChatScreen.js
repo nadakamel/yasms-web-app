@@ -30,7 +30,7 @@ class ChatScreen extends Component {
     super(props);
     this.state = {
       username: "",
-      sidepanelview: "addchat"
+      sidepanelview: "chatlist"
     };
     this.sendMessage = this.sendMessage.bind(this);
   }
@@ -50,13 +50,13 @@ class ChatScreen extends Component {
     let mainstageview;
     switch (this.state.sidepanelview) {
       case "chatlist":
-        sidepanelview = <ContactsList onNavigate={this.onNavigate.bind(this)} />;
+        sidepanelview = <ContactsList appserver={this.props.appserver} appkeys={this.props.appkeys} onNavigate={this.onNavigate.bind(this)} />;
         break;
       case "myidentities":
-        sidepanelview = <MyIdentities onNavigate={this.onNavigate.bind(this)} />;
+        sidepanelview = <MyIdentities appserver={this.props.appserver} appkeys={this.props.appkeys} onNavigate={this.onNavigate.bind(this)} />;
         break;
       case "addchat":
-        sidepanelview = <AddChat onNavigate={this.onNavigate.bind(this)} />;
+        sidepanelview = <AddChat appserver={this.props.appserver} appkeys={this.props.appkeys} onNavigate={this.onNavigate.bind(this)} />;
         break;
       default:
         sidepanelview = <div />;

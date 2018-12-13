@@ -12,7 +12,7 @@ class App extends Component {
     const appcommunicationkey = new NodeRSA().generateKeyPair(1024);
     const appsigningkey = new NodeRSA().generateKeyPair(1024);
     this.state = {
-      currentScreen: "ChatScreen",
+      currentScreen: "SetAppServerScreen",
       keys: {
         communication: appcommunicationkey,
         signing: appsigningkey
@@ -61,9 +61,9 @@ class App extends Component {
       case "LoginScreen":
         return <LoginScreen onLogin={this.handleLogin.bind(this)} appserver={this.state.appserver} appsigningkey={this.state.keys.signing} appcommunicationkey={this.state.keys.communication} />;
       case "RegisterScreen":
-        return <RegisterScreen csinfo={this.handlelogin} appserver={this.state.appserver} appkey={this.state.keys.communication} onRegister={this.handleRegister.bind(this)} />
+        return <RegisterScreen appserver={this.state.appserver} appkey={this.state.keys.communication} onRegister={this.handleRegister.bind(this)} />
       case "ChatScreen":
-        return <ChatScreen />
+        return <ChatScreen appserver={this.state.appserver} appkeys={this.state.keys} />
       case "LandingScreen":
         return (
           <div className="App">

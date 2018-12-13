@@ -14,15 +14,67 @@ class MyIdentities extends Component {
     }
 
     componentDidMount() {
-        
+          let requestbody = {
+            command: "getidentities"
+          };
+          requestbody = this.props.appkeys.signing.encryptPrivate(this.props.appserver.info.keys.communication.encrypt(JSON.stringify(requestbody), 'base64'), 'base64');
+          request.post({
+            url: this.props.appserver.address + "/getidentities",
+            body: {
+              message: requestbody
+            },
+            json: true
+          }, (err, serres, body) => {
+            if (err || serres.statusCode !== 200) {
+              body = JSON.parse(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8'));
+              console.error(body);
+            } else {
+              const response = JSON.parse(this.props.appkeys.communication.decrypt(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8')).toString('utf-8'));
+              this.setState({
+                identities: response
+              });
+            }
+          });
     }
 
     navigateTo(view) {
         this.props.onNavigate(view);
     }
 
-    tryToAddIdentity() {
-        console.log("new identity name", this.state.newidentityname);
+    tryToAddIdentity(evt) {
+          evt.preventDefault();
+          let requestbody = {
+            identityname: this.state.newidentityname
+          };
+          requestbody = this.props.appkeys.signing.encryptPrivate(this.props.appserver.info.keys.communication.encrypt(JSON.stringify(requestbody), 'base64'), 'base64');
+          request.post({
+            url: this.props.appserver.address + "/addidentity",
+            body: {
+              message: requestbody
+            },
+            json: true
+          }, (err, serres, body) => {
+            if (err || serres.statusCode !== 200) {
+              body = JSON.parse(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8'));
+              console.error(body);
+              if (body.yasmscode === 2) {
+                alert("Identity Name already taken.");
+              } else {
+                alert("Problem with the server");
+              }
+            } else {
+              const response = JSON.parse(this.props.appkeys.communication.decrypt(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8')).toString('utf-8'));
+              if (response.status && response.status === "success") {
+                  this.setState({
+                      identities: [
+                          ...this.state.identities,
+                          this.state.newidentityname
+                      ],
+                      newidentityname: ""
+                  });
+              }
+            }
+          });
     }
 
     handleInputChange(evt) {
@@ -44,8 +96,8 @@ class MyIdentities extends Component {
                     </div>
                 </div>
                 <div style={{background: "darkgray", padding: "10px", display: "flex", height: "60px", flexDirection: "row", alignItems: "center"}}>
-                    <input type="text" style={{flex: 1, height: "30px"}} placeholder="Identity Name" onChange={this.handleInputChange.bind(this)} value={this.state.newidentityname}></input>
-                    <i className="fas fa-plus" style={{marginLeft: "10px", fontSize: "20px", cursor: "pointer"}} onClick={() => {this.tryToAddIdentity();}}></i>
+                    <form style={{display: "flex", flexDirection: "row", flex: 1}} onSubmit={this.tryToAddIdentity.bind(this)}><input type="text" style={{flex: 1, height: "30px"}} placeholder="Identity Name" onChange={this.handleInputChange.bind(this)} value={this.state.newidentityname}></input>
+                    <button type="submit" className="fas fa-plus" style={{background: "rgba(0,0,0,0)", border: "none", marginLeft: "10px", fontSize: "20px", cursor: "pointer"}} /></form>
                 </div>
                 <div style={{padding: "10px", display: "flex", flexDirection: "column", flex: 1}}>
                     {identityitems}
