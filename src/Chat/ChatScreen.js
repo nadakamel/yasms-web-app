@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import ContactsList from "./components/ContactsList";
 import MyIdentities from './components/MyIdentities';
 import AddChat from './components/AddChat';
+import ChatWindow from './components/ChatWindow';
 
 const styles = {
   container: {
@@ -30,7 +31,8 @@ class ChatScreen extends Component {
     super(props);
     this.state = {
       username: "",
-      sidepanelview: "chatlist"
+      sidepanelview: "chatlist",
+      selectedChat: null
     };
     this.sendMessage = this.sendMessage.bind(this);
   }
@@ -41,8 +43,18 @@ class ChatScreen extends Component {
 
   onNavigate(view) {
     this.setState({
-      sidepanelview: view
+      sidepanelview: view,
+      selectedChat: null
     });
+  }
+
+  setSelectedChat(sender, receiver) {
+    this.setState({
+      selectedChat: {
+        sender: sender,
+        receiver: receiver
+      }
+    })
   }
 
   render() {
@@ -50,7 +62,7 @@ class ChatScreen extends Component {
     let mainstageview;
     switch (this.state.sidepanelview) {
       case "chatlist":
-        sidepanelview = <ContactsList appserver={this.props.appserver} appkeys={this.props.appkeys} onNavigate={this.onNavigate.bind(this)} />;
+        sidepanelview = <ContactsList onSelect={this.setSelectedChat.bind(this)} appserver={this.props.appserver} appkeys={this.props.appkeys} onNavigate={this.onNavigate.bind(this)} />;
         break;
       case "myidentities":
         sidepanelview = <MyIdentities appserver={this.props.appserver} appkeys={this.props.appkeys} onNavigate={this.onNavigate.bind(this)} />;
@@ -61,7 +73,7 @@ class ChatScreen extends Component {
       default:
         sidepanelview = <div />;
     }
-    mainstageview = sidepanelview === "chatlist" ? <div /> : <div />;
+    mainstageview = (this.state.sidepanelview === "chatlist" && this.state.selectedChat) ? <ChatWindow sender={this.state.selectedChat.sender} receiver={this.state.selectedChat.receiver} appserver={this.props.appserver} appkeys={this.props.appkeys} /> : <div />;
     return (
       <div style={styles.container}>
         <div style={styles.chatContainer}>

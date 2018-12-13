@@ -10,7 +10,7 @@ class PendingFriendRequestItem extends Component {
     render() {
         return(
             <div style={{fontStyle: "italics"}}>
-                {this.props.title}
+                {this.props.sender}: {this.props.receiver} @ {this.props.time}
             </div>
         )
     }

@@ -7,15 +7,18 @@ const styles = {
     marginBottom: 20
   },
   form: {
-    display: "flex"
+    display: "flex",
+    flex: 1
   },
   input: {
     color: "inherit",
-    background: "none",
+    background: "white",
     outline: "none",
     border: "none",
     flex: 1,
-    fontSize: 16
+    fontSize: 16,
+    borderRadius: "100px",
+    padding: "15px"
   }
 };
 
@@ -44,18 +47,17 @@ class SendMessageForm extends Component {
 
   render() {
     return (
-      <div style={styles.container}>
-        <div>
+      <div style={{display: "flex", flexDirection: "row", flex: 1}}>
           <form onSubmit={this.onSubmit} style={styles.form}>
             <input
               type="text"
-              placeholder="Type a message here then hit ENTER"
+              placeholder="Type your message here..."
               onChange={this.onChange}
               value={this.state.text}
               style={styles.input}
             />
+            <button type="submit" className="fas fa-paper-plane" style={{fontSize: "20pt", background: "rgba(0,0,0,0)", border: "none"}} />
           </form>
-        </div>
       </div>
     );
   }

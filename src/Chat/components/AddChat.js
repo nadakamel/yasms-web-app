@@ -9,17 +9,42 @@ class AddChat extends Component {
         this.state = {
             identities: [
             ],
-            identityname: ""
+            identityname: "",
+            myidentities: []
         };
     }
 
     componentDidMount() {
-        
+        this.getIdentities();
     }
 
     navigateTo(view) {
         this.props.onNavigate(view);
     }
+
+    getIdentities() {
+        let requestbody = {
+          command: "getidentities"
+        };
+        requestbody = this.props.appkeys.signing.encryptPrivate(this.props.appserver.info.keys.communication.encrypt(JSON.stringify(requestbody), 'base64'), 'base64');
+        request.post({
+          url: this.props.appserver.address + "/getidentities",
+          body: {
+            message: requestbody
+          },
+          json: true
+        }, (err, serres, body) => {
+          if (err || serres.statusCode !== 200) {
+            body = JSON.parse(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8'));
+            console.error(body);
+          } else {
+            const response = JSON.parse(this.props.appkeys.communication.decrypt(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8')).toString('utf-8'));
+            this.setState({
+              myidentities: response
+            });
+          }
+        });
+  }
 
     searchForIdentity(evt) {
           evt.preventDefault();
@@ -49,7 +74,38 @@ class AddChat extends Component {
     }
 
     onAdd(identityname) {
-        console.log("IDENTITY NAME", identityname);
+        const from = window.prompt("Enter identity you wish to send request from");
+        if (this.state.myidentities.indexOf(from) > -1) {
+            let requestbody = {
+                identitynamefrom: from,
+                identitynameto: identityname
+            };
+            requestbody = this.props.appkeys.signing.encryptPrivate(this.props.appserver.info.keys.communication.encrypt(JSON.stringify(requestbody), 'base64'), 'base64');
+            request.post({
+                url: this.props.appserver.address + "/sendchatrequest",
+                body: {
+                    message: requestbody
+                },
+                json: true
+            }, (err, serres, body) => {
+                if (err || serres.statusCode !== 200) {
+                    body = JSON.parse(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8'));
+                    switch(body.yasmscode) {
+                        case 3:
+                            alert("User is offline");
+                        case 4:
+                            alert("Chat already requested");
+                    }
+                } else {
+                    const response = JSON.parse(this.props.appkeys.communication.decrypt(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8')).toString('utf-8'));
+                    if (response.status && response.status === "success") {
+                        this.navigateTo("chatlist");
+                    }
+                }
+            });
+        } else {
+            alert("Identity entered is not one you own");
+        }
     }
 
     handleInputChange(evt) {
