@@ -25,6 +25,10 @@ class ContactsList extends Component {
         
     }
 
+    navigateTo(view) {
+        this.props.onNavigate(view);
+    }
+
     render() {
         const contactdivs = [];
         const pendingfriendrequestdivs = [];
@@ -48,10 +52,9 @@ class ContactsList extends Component {
                     <div style={{float: "left", display: "flex", flexDirection: "row", flexGrow: 1, alignSelf: "flex-start", height: "100%"}}>
                         {identityitems}
                     </div>
-                    <div style={{float: "left", display: "flex", flexDirection: "row-reverse", width: "30%", alignSelf: "flex-end", alignItems: "right", height: "100%"}}>
-                        <i>1</i>
-                        <i>2</i>
-                        <i>3</i>
+                    <div style={{cursor: "pointer", float: "left", display: "flex", alignItems: "center", fontSize: "25pt", flexDirection: "row-reverse", width: "30%", alignSelf: "flex-end", alignItems: "right", height: "100%"}}>
+                        <i className="fas fa-plus" style={{marginLeft: "10px"}} onClick={() => {this.navigateTo("addchat")}}></i>
+                        <i className="fas fa-user" onClick={() => {this.navigateTo("myidentities")}}></i>
                     </div>
                 </div>
                 <div style={{background: "darkgray", fontSize: "10pt", paddingLeft: "5px", color: "lightgrey"}}>Received Friend Requests</div>

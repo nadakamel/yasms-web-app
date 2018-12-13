@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import ContactsList from "./components/ContactsList";
+import MyIdentities from './components/MyIdentities';
+import AddChat from './components/AddChat';
 
 const styles = {
   container: {
@@ -28,7 +30,7 @@ class ChatScreen extends Component {
     super(props);
     this.state = {
       username: "",
-      sidepanelview: "chatlist"
+      sidepanelview: "addchat"
     };
     this.sendMessage = this.sendMessage.bind(this);
   }
@@ -37,18 +39,24 @@ class ChatScreen extends Component {
     alert(text);
   }
 
+  onNavigate(view) {
+    this.setState({
+      sidepanelview: view
+    });
+  }
+
   render() {
     let sidepanelview;
     let mainstageview;
     switch (this.state.sidepanelview) {
       case "chatlist":
-        sidepanelview = <ContactsList />;
+        sidepanelview = <ContactsList onNavigate={this.onNavigate.bind(this)} />;
         break;
       case "myidentities":
-        sidepanelview = <div />;
+        sidepanelview = <MyIdentities onNavigate={this.onNavigate.bind(this)} />;
         break;
       case "addchat":
-        sidepanelview = <div />;
+        sidepanelview = <AddChat onNavigate={this.onNavigate.bind(this)} />;
         break;
       default:
         sidepanelview = <div />;
