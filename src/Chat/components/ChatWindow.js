@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import "../../App.css"
 import request from 'request';
 import SendMessageForm from './SendMessageForm';
+import MessageItem from './MessageItem';
 
 class ChatWindow extends Component {
     constructor(props) {
@@ -14,15 +15,26 @@ class ChatWindow extends Component {
     }
 
     componentDidMount() {
-      this.cansend();
+        this.cansend();
+        this.getmessages();
+        setInterval(()=>{
+            this.getmessages();
+        }, 1000);
     }
 
     componentWillUnmount() {
         //clearInterval();
     }
 
+    componentWillUpdate() {
+        this.currentsender = this.props.sender;
+        this.currentreceiver = this.props.receiver;
+    }
+
     componentDidUpdate() {
-      this.cansend();
+        if (this.props.sender !== this.currentsender || this.props.receiver !== this.currentreceiver) {
+            this.cansend();
+        }
     }
 
     cansend() {
@@ -43,6 +55,10 @@ class ChatWindow extends Component {
               body = JSON.parse(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8'));
               if (!(body.error && body.error === "can't send")) {
                 console.error(body);
+              } else {
+                  this.setState({
+                      cansend: false
+                  });
               }
           } else {
             const response = JSON.parse(this.props.appkeys.communication.decrypt(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8')).toString('utf-8'));
@@ -55,14 +71,40 @@ class ChatWindow extends Component {
       });
     }
 
+    getmessages() {
+        let requestbody = {
+            persona: this.props.sender,
+            personb: this.props.receiver,
+            command: "getmessages"
+          };
+          requestbody = this.props.appkeys.signing.encryptPrivate(this.props.appserver.info.keys.communication.encrypt(JSON.stringify(requestbody), 'base64'), 'base64');
+          request.post({
+              url: this.props.appserver.address + "/getmessages",
+              body: {
+                  message: requestbody
+              },
+              json: true
+          }, (err, serres, body) => {
+              if (err || serres.statusCode !== 200) {
+                  body = JSON.parse(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8'));
+                  console.error(body);
+              } else {
+                const response = JSON.parse(this.props.appkeys.communication.decrypt(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8')).toString('utf-8'));
+                if (response.status && response.status === "success") {
+                  this.setState({
+                      messages: response.messages
+                  });
+                }
+              }
+          });
+    }
+
     block() {
-      console.log("BLOCK");
       let requestbody = {
         identitynamefrom: this.props.sender,
         identitynameto: this.props.receiver,
         command: "block"
       };
-      console.log("BLOCK", requestbody);
       requestbody = this.props.appkeys.signing.encryptPrivate(this.props.appserver.info.keys.communication.encrypt(JSON.stringify(requestbody), 'base64'), 'base64');
       request.post({
           url: this.props.appserver.address + "/block",
@@ -78,11 +120,40 @@ class ChatWindow extends Component {
       });
     }
 
+    onSendMessage(messagestring) {
+        let requestbody = {
+            from: this.props.receiver,
+            to: this.props.sender,
+            message: messagestring,
+            command: "sendmessage",
+            time: (new Date()).getTime()
+          };
+          requestbody = this.props.appkeys.signing.encryptPrivate(this.props.appserver.info.keys.communication.encrypt(JSON.stringify(requestbody), 'base64'), 'base64');
+          request.post({
+              url: this.props.appserver.address + "/sendmessage",
+              body: {
+                  message: requestbody
+              },
+              json: true
+          }, (err, serres, body) => {
+              if (err || serres.statusCode !== 200) {
+                  body = JSON.parse(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8'));
+                  if (body.error && body.error === this.props.sender + " refused message") {
+                      this.setState({
+                          cansend: false
+                      });
+                  }
+              } else {
+                const response = JSON.parse(this.props.appkeys.communication.decrypt(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8')).toString('utf-8'));
+              }
+          });
+    }
+
     render() {
-        let sendform = "Sorry. You can't send messages to this person.";
-        if (this.state.cansend) {
-          sendform = <SendMessageForm />
-        }
+        const messageitems = [];
+        this.state.messages.forEach((message)=>{
+            messageitems.push(<MessageItem key={"message_"+message.sender+"_"+message.receiver+"_"+parseInt(message.sentat)} sender={message.sender} messagetime={message.sentat} messagetext={message.messagetext} />)
+        });
         return(
             <div style={{display: "flex", flexDirection: "column", width: "100%", flex: 1}}>
                 <div style={{height: "60px", background: "darkgray", padding: "10px", display: "flex", flexDirection: "row"}}>
@@ -94,10 +165,10 @@ class ChatWindow extends Component {
                     </div>
                 </div>
                 <div style={{padding: "10px", display: "flex", flexDirection: "column", flex: 1}}>
-                    
+                    {messageitems}
                 </div>
                 <div style={{height: "60px", background: "darkgray", padding: "10px", display: "flex", flexDirection: "row"}}>
-                    {sendform}
+                    <SendMessageForm onSubmit={this.onSendMessage.bind(this)} cansend={this.state.cansend} />
                 </div>
             </div>
         )

@@ -44,6 +44,7 @@ class RegisterScreen extends Component {
           alert("Username already taken.");
         } else {
           alert("Problem with the server");
+          console.error(body);
         }
       } else {
         const keyfile = this.props.appkey.decrypt(this.props.appserver.info.keys.signing.decryptPublic(body).toString('utf-8')).toString('utf-8');
