@@ -46,24 +46,44 @@ class SendMessageForm extends Component {
   }
 
   render() {
-    let form = "Sorry, you can't send messages to this identity";
     if (this.props.cansend) {
-      form = <form onSubmit={this.onSubmit} style={styles.form}>
-                <input
-                  type="text"
-                  placeholder="Type your message here..."
-                  onChange={this.onChange}
-                  value={this.state.text}
-                  style={styles.input}
-                />
-                <button type="submit" className="fas fa-paper-plane" style={{fontSize: "20pt", background: "rgba(0,0,0,0)", border: "none"}} />
-              </form>;
+      return (
+        <div style={{ display: "flex", flexDirection: "row", flex: 1 }}>
+          <form onSubmit={this.onSubmit} style={styles.form}>
+            <input
+              type="text"
+              placeholder="Type your message here..."
+              onChange={this.onChange}
+              value={this.state.text}
+              style={styles.input}
+            />
+            <button
+              type="submit"
+              className="fas fa-paper-plane"
+              style={{
+                fontSize: "20pt",
+                background: "rgba(0,0,0,0)",
+                border: "none"
+              }}
+            />
+          </form>
+        </div>
+      );
+    } else {
+      return (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            flex: 1,
+            marginTop: "10px",
+            color: "rgba(105, 35, 38, 1)"
+          }}
+        >
+          Sorry, you can't send messages to this identity
+        </div>
+      );
     }
-    return (
-      <div style={{display: "flex", flexDirection: "row", flex: 1}}>
-          {form}
-      </div>
-    );
   }
 }
 

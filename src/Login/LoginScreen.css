@@ -3,6 +3,10 @@
   margin: 10px;
 }
 
+.Login-file {
+  padding: 12px 30px;
+}
+
 .Login-button {
   background-color: #008cba;
   border: none;

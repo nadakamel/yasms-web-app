@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import ContactsList from "./components/ContactsList";
-import MyIdentities from './components/MyIdentities';
-import AddChat from './components/AddChat';
-import ChatWindow from './components/ChatWindow';
+import MyIdentities from "./components/MyIdentities";
+import AddChat from "./components/AddChat";
+import ChatWindow from "./components/ChatWindow";
 
 const styles = {
   container: {
@@ -15,7 +15,7 @@ const styles = {
     flex: 1
   },
   whosOnlineListContainer: {
-    width: "30%",
+    width: "33%",
     flex: "none",
     display: "flex"
   },
@@ -54,7 +54,7 @@ class ChatScreen extends Component {
         sender: sender,
         receiver: receiver
       }
-    })
+    });
   }
 
   render() {
@@ -62,27 +62,52 @@ class ChatScreen extends Component {
     let mainstageview;
     switch (this.state.sidepanelview) {
       case "chatlist":
-        sidepanelview = <ContactsList onSelect={this.setSelectedChat.bind(this)} appserver={this.props.appserver} appkeys={this.props.appkeys} onNavigate={this.onNavigate.bind(this)} />;
+        sidepanelview = (
+          <ContactsList
+            onSelect={this.setSelectedChat.bind(this)}
+            appserver={this.props.appserver}
+            appkeys={this.props.appkeys}
+            onNavigate={this.onNavigate.bind(this)}
+          />
+        );
         break;
       case "myidentities":
-        sidepanelview = <MyIdentities appserver={this.props.appserver} appkeys={this.props.appkeys} onNavigate={this.onNavigate.bind(this)} />;
+        sidepanelview = (
+          <MyIdentities
+            appserver={this.props.appserver}
+            appkeys={this.props.appkeys}
+            onNavigate={this.onNavigate.bind(this)}
+          />
+        );
         break;
       case "addchat":
-        sidepanelview = <AddChat appserver={this.props.appserver} appkeys={this.props.appkeys} onNavigate={this.onNavigate.bind(this)} />;
+        sidepanelview = (
+          <AddChat
+            appserver={this.props.appserver}
+            appkeys={this.props.appkeys}
+            onNavigate={this.onNavigate.bind(this)}
+          />
+        );
         break;
       default:
         sidepanelview = <div />;
     }
-    mainstageview = (this.state.sidepanelview === "chatlist" && this.state.selectedChat) ? <ChatWindow sender={this.state.selectedChat.sender} receiver={this.state.selectedChat.receiver} appserver={this.props.appserver} appkeys={this.props.appkeys} /> : <div />;
+    mainstageview =
+      this.state.sidepanelview === "chatlist" && this.state.selectedChat ? (
+        <ChatWindow
+          sender={this.state.selectedChat.sender}
+          receiver={this.state.selectedChat.receiver}
+          appserver={this.props.appserver}
+          appkeys={this.props.appkeys}
+        />
+      ) : (
+        <div />
+      );
     return (
       <div style={styles.container}>
         <div style={styles.chatContainer}>
-          <aside style={styles.whosOnlineListContainer}>
-            {sidepanelview}
-          </aside>
-          <section style={styles.chatListContainer}>
-            {mainstageview}
-          </section>
+          <aside style={styles.whosOnlineListContainer}>{sidepanelview}</aside>
+          <section style={styles.chatListContainer}>{mainstageview}</section>
         </div>
       </div>
     );
