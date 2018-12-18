@@ -11,8 +11,11 @@ https://nodejs.org/en/download/
 3) Using Terminal, cd into project's folder directory
 `cd ~/yasms-web-app`
 
-3) Download node_modules folder to the project using this command line
+4) Download node_modules folder to the project using this command line
 `npm install`
 
-4) Run the project on Terminal using this command line
+5) Download reactstrap using this command line
+`npm install --save reactstrap react react-dom`
+
+6) Run the project on Terminal using this command line
 `npm start`
