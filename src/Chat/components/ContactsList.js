@@ -374,26 +374,31 @@ class ContactsList extends Component {
     });
     if (this.state.identities.length == 1) {
       identityitems.push(
-        <i style={{ marginRight: "5px" }}>{this.state.identities[0]}</i>
+        <i key={"i_" + this.state.identities[0]} style={{ marginRight: "5px" }}>
+          {this.state.identities[0]}
+        </i>
       );
-    } else if (this.state.identities.length > 1) {
-      var counter = 0;
-      this.state.identities.forEach(identity => {
-        if (counter == this.state.identities.length - 1) {
-          identityitems.push(
-            <i key={"i_" + identity} style={{ marginRight: "5px" }}>
-              {identity}
-            </i>
-          );
-        } else {
-          identityitems.push(
-            <i key={"i_" + identity} style={{ marginRight: "5px" }}>
-              {identity},
-            </i>
-          );
-        }
-        counter += 1;
-      });
+    } else if (this.state.identities.length == 2) {
+      identityitems.push(
+        <i key={"i_" + this.state.identities[0]} style={{ marginRight: "5px" }}>
+          {this.state.identities[0]},
+        </i>
+      );
+      identityitems.push(
+        <i key={"i_" + this.state.identities[1]} style={{ marginRight: "5px" }}>
+          {this.state.identities[1]}
+        </i>
+      );
+    } else if (this.state.identities.length > 2) {
+      identityitems.push(
+        <i style={{ marginRight: "5px" }}>{this.state.identities[0]},</i>
+      );
+      identityitems.push(
+        <i style={{ marginRight: "5px" }}>{this.state.identities[1]}</i>
+      );
+      identityitems.push(
+        "and " + (this.state.identities.length - 2) + " others"
+      );
     }
     let pendingfriendrequestsection = "";
     if (this.state.pendingfriendrequests.length > 0) {
