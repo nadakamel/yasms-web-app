@@ -11,10 +11,10 @@ class MessageItem extends Component {
       <div
         style={{
           flexDirection: "column",
-          display: "flex",
           padding: "10px",
           marginBottom: "5px",
-          background: this.props.selected ? "aliceblue" : "white"
+          background: this.props.selected ? "aliceblue" : "white",
+          height: "120px"
         }}
       >
         <p style={{ marginBottom: "0px", fontWeight: "bold" }}>

@@ -11,23 +11,26 @@ class ChatWindow extends Component {
       messages: [],
       cansend: false
     };
+    this.msgcontainer = React.createRef();
   }
 
   componentDidMount() {
+    this.lastupdate = 0;
     this.cansend();
     this.getmessages();
-    setInterval(() => {
+    this.refresher = setInterval(() => {
       this.getmessages();
     }, 1000);
   }
 
   componentWillUnmount() {
-    //clearInterval();
+    clearInterval(this.refresher);
   }
 
   componentWillUpdate() {
     this.currentsender = this.props.sender;
     this.currentreceiver = this.props.receiver;
+    this.messagelength = this.state.messages.length;
   }
 
   componentDidUpdate() {
@@ -36,6 +39,9 @@ class ChatWindow extends Component {
       this.props.receiver !== this.currentreceiver
     ) {
       this.cansend();
+    }
+    if (this.state.messages.length > this.messagelength) {
+      //Should scroll to bottom
     }
   }
 
@@ -95,52 +101,56 @@ class ChatWindow extends Component {
   }
 
   getmessages() {
-    let requestbody = {
-      persona: this.props.sender,
-      personb: this.props.receiver,
-      command: "getmessages"
-    };
-    requestbody = this.props.appkeys.signing.encryptPrivate(
-      this.props.appserver.info.keys.communication.encrypt(
-        JSON.stringify(requestbody),
+    if (this.lastupdate < new Date().getTime() - 1000) {
+      console.log("Get Messages", new Date().toString());
+      let requestbody = {
+        persona: this.props.sender,
+        personb: this.props.receiver,
+        command: "getmessages"
+      };
+      requestbody = this.props.appkeys.signing.encryptPrivate(
+        this.props.appserver.info.keys.communication.encrypt(
+          JSON.stringify(requestbody),
+          "base64"
+        ),
         "base64"
-      ),
-      "base64"
-    );
-    request.post(
-      {
-        url: this.props.appserver.address + "/getmessages",
-        body: {
-          message: requestbody
+      );
+      request.post(
+        {
+          url: this.props.appserver.address + "/getmessages",
+          body: {
+            message: requestbody
+          },
+          json: true
         },
-        json: true
-      },
-      (err, serres, body) => {
-        if (err || serres.statusCode !== 200) {
-          body = JSON.parse(
-            this.props.appserver.info.keys.signing
-              .decryptPublic(body)
-              .toString("utf-8")
-          );
-          console.error(body);
-        } else {
-          const response = JSON.parse(
-            this.props.appkeys.communication
-              .decrypt(
-                this.props.appserver.info.keys.signing
-                  .decryptPublic(body)
-                  .toString("utf-8")
-              )
-              .toString("utf-8")
-          );
-          if (response.status && response.status === "success") {
-            this.setState({
-              messages: response.messages
-            });
+        (err, serres, body) => {
+          if (err || serres.statusCode !== 200) {
+            body = JSON.parse(
+              this.props.appserver.info.keys.signing
+                .decryptPublic(body)
+                .toString("utf-8")
+            );
+            console.error(body);
+          } else {
+            const response = JSON.parse(
+              this.props.appkeys.communication
+                .decrypt(
+                  this.props.appserver.info.keys.signing
+                    .decryptPublic(body)
+                    .toString("utf-8")
+                )
+                .toString("utf-8")
+            );
+            if (response.status && response.status === "success") {
+              this.lastupdate = new Date().getTime();
+              this.setState({
+                messages: response.messages
+              });
+            }
           }
         }
-      }
-    );
+      );
+    }
   }
 
   block() {
@@ -243,10 +253,8 @@ class ChatWindow extends Component {
         <div
           ref={el => {
             if (index == this.state.messages.length - 1) {
-              debugger;
               this.lastMsg = el;
               if (el && el != this.lastMsgRef) {
-                debugger;
                 this.lastMsgRef = el;
                 this.updateScrollView();
               }
@@ -372,7 +380,9 @@ class ChatWindow extends Component {
               />
             </div>
           </div>
-          <div style={styles.messagesListView}>{messageitems}</div>
+          <div style={styles.messagesListView} ref={this.msgcontainer}>
+            {messageitems}
+          </div>
           <div style={styles.cantSendMessageView}>
             <SendMessageForm
               onSubmit={this.onSendMessage.bind(this)}
