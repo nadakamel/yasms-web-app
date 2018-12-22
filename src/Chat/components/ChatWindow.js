@@ -177,7 +177,13 @@ class ChatWindow extends Component {
     );
   }
 
+  updateScrollView = () => {
+    if (this.lastMsg) this.lastMsg.scrollIntoView({ behavior: "auto" });
+  };
+
   onSendMessage(messagestring) {
+    this.updateScrollView();
+
     let requestbody = {
       from: this.props.receiver,
       to: this.props.sender,
@@ -231,22 +237,36 @@ class ChatWindow extends Component {
   }
 
   render() {
-    const messageitems = [];
-    this.state.messages.forEach(message => {
+    let messageitems = [];
+    this.state.messages.forEach((message, index) => {
       messageitems.push(
-        <MessageItem
-          key={
-            "message_" +
-            message.sender +
-            "_" +
-            message.receiver +
-            "_" +
-            parseInt(message.sentat)
-          }
-          sender={message.sender}
-          messagetime={message.sentat}
-          messagetext={message.messagetext}
-        />
+        <div
+          ref={el => {
+            if (index == this.state.messages.length - 1) {
+              debugger;
+              this.lastMsg = el;
+              if (el && el != this.lastMsgRef) {
+                debugger;
+                this.lastMsgRef = el;
+                this.updateScrollView();
+              }
+            }
+          }}
+        >
+          <MessageItem
+            key={
+              "message_" +
+              message.sender +
+              "_" +
+              message.receiver +
+              "_" +
+              parseInt(message.sentat)
+            }
+            sender={message.sender}
+            messagetime={message.sentat}
+            messagetext={message.messagetext}
+          />
+        </div>
       );
     });
 
@@ -272,7 +292,7 @@ class ChatWindow extends Component {
         fontWeight: "bold",
         fontSize: "18pt"
       },
-      topbarLeftItemView: {
+      topbarRightItemView: {
         cursor: "pointer",
         float: "left",
         display: "flex",
@@ -294,7 +314,8 @@ class ChatWindow extends Component {
         padding: "10px",
         display: "flex",
         flexDirection: "column",
-        flex: 1
+        flex: 1,
+        overflow: "auto"
       },
       sendMessageView: {
         height: "60px",
@@ -319,7 +340,7 @@ class ChatWindow extends Component {
             <div style={styles.topbarTitle}>
               {this.props.sender}: {this.props.receiver}
             </div>
-            <div style={styles.topbarLeftItemView}>
+            <div style={styles.topbarRightItemView}>
               <i
                 className="fas fa-ban"
                 style={styles.blockItem}
@@ -343,7 +364,7 @@ class ChatWindow extends Component {
             <div style={styles.topbarTitle}>
               {this.props.sender}: {this.props.receiver}
             </div>
-            <div style={styles.topbarLeftItemView}>
+            <div style={styles.topbarRightItemView}>
               <i
                 className="fas fa-ban"
                 style={styles.blockItem}
